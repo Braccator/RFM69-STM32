@@ -25,7 +25,7 @@
  */
 
 #include "rfm69.hpp"
-#include "tools/systimer.h"
+//#include "tools/systimer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,9 +47,12 @@ static const uint8_t rfm69_base_config[][2] =
     {0x04, 0x80}, // RegBitrateLsb
     {0x05, 0x01}, // RegFdevMsb: 20 kHz
     {0x06, 0x48}, // RegFdevLsb
-    {0x07, 0xD9}, // RegFrfMsb: 868,15 MHz
+/*    {0x07, 0xD9}, // RegFrfMsb: 868,15 MHz
     {0x08, 0x09}, // RegFrfMid
-    {0x09, 0x9A}, // RegFrfLsb
+    {0x09, 0x9A}, // RegFrfLsb*/
+	{0x07, 0x6C}, // RegFrfMsb: 433,00 MHz
+	{0x08, 0x40}, // RegFrfMid
+	{0x09, 0x00}, // RegFrfLsb
     {0x18, 0x88}, // RegLNA: 200 Ohm impedance, gain set by AGC loop
     {0x19, 0x4C}, // RegRxBw: 25 kHz
     {0x2C, 0x00}, // RegPreambleMsb: 3 bytes preamble
@@ -67,6 +70,11 @@ static const uint8_t rfm69_base_config[][2] =
 // Clock constants. DO NOT CHANGE THESE!
 #define RFM69_XO               32000000    ///< Internal clock frequency [Hz]
 #define RFM69_FSTEP            61.03515625 ///< Step width of synthesizer [Hz]
+
+#define GPIO_SetBits(port, pin) (HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET))
+#define GPIO_ResetBits(port, pin) (HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET))
+#define delay_ms(time) (HAL_Delay(time))
+#define mstimer_get() (HAL_GetTick())
 
 /**
  * RFM69 default constructor. Use init() to start working with the RFM69 module.
@@ -135,6 +143,7 @@ void RFM69::reset()
 bool RFM69::init()
 {
   // set base configuration
+	for (int i =1;i<2; i++)
   setCustomConfig(rfm69_base_config, sizeof(rfm69_base_config) / 2);
 
   // set PA and OCP settings according to RF module (normal/high power)
@@ -258,7 +267,8 @@ void RFM69::writeRegister(uint8_t reg, uint8_t value)
  */
 void RFM69::chipSelect()
 {
-  GPIO_ResetBits(_csGPIO, _csPin);
+
+    GPIO_ResetBits(_csGPIO, _csPin);
 }
 
 /**
@@ -313,7 +323,8 @@ RFM69Mode RFM69::setMode(RFM69Mode mode)
  */
 void RFM69::chipUnselect()
 {
-  GPIO_SetBits(_csGPIO, _csPin);
+
+    GPIO_SetBits(_csGPIO, _csPin);
 }
 
 /**
