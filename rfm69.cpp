@@ -43,7 +43,8 @@ static const uint8_t rfm69_base_config[][2] =
 {
     {0x01, 0x04}, // RegOpMode: Standby Mode
     {0x02, 0x00}, // RegDataModul: Packet mode, FSK, no shaping
-    {0x03, 0x0C}, // RegBitrateMsb: 10 kbps
+    //{0x03, 0x0C}, // RegBitrateMsb: 10 kbps
+	{0x03, 0x20},
     {0x04, 0x80}, // RegBitrateLsb
     {0x05, 0x01}, // RegFdevMsb: 20 kHz
     {0x06, 0x48}, // RegFdevLsb
